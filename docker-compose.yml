@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    
+    shm_size: 128mb
+    
+    environment:
+      POSTGRES_DB: "main_db"
+      POSTGRES_USER: "mxcitn"
+      POSTGRES_PASSWORD: "1234"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+      
+volumes:
+  my-pg-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'data'
