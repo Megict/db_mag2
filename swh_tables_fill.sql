@@ -5,7 +5,7 @@ insert into dwh.d_craftsmans
 	(select craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, CURRENT_TIMESTAMP from source3.craft_market_craftsmans) 
 on conflict (craftsman_id)
 	do nothing -- пропускаем старые записи
-
+;
 -- заполненние справочника покупателей
 insert into dwh.d_customers 
 	(customer_id, customer_name, customer_address, customer_birthday, customer_email, load_dttm)
@@ -13,7 +13,7 @@ insert into dwh.d_customers
 	(select customer_id, customer_name, customer_address, customer_birthday, customer_email, CURRENT_TIMESTAMP from source3.craft_market_customers) 
 on conflict (customer_id)
 	do nothing -- пропускаем старые записи
-
+;
 -- заполненние справочника продуктов
 insert into dwh.d_products 
 	(product_id, product_name, product_description, product_type, product_price, load_dttm)
@@ -21,7 +21,7 @@ insert into dwh.d_products
 	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source2.craft_market_masters_products) 
 on conflict (product_id)
 	do nothing -- пропускаем старые записи
-
+;
 -- заполненние справочника заказов
 insert into dwh.f_orders
 	(order_id, product_id, craftsman_id, customer_id, order_created_date, order_completion_date, order_status, load_dttm)
