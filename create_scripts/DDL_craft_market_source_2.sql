@@ -1,5 +1,4 @@
 -- DROP SCHEMA source2 CASCADE;
-
 CREATE SCHEMA source2;
 
 -- DROP TABLE source2.craft_market_masters_products;

@@ -1,5 +1,4 @@
 -- DROP SCHEMA source3 CASCADE;
-
 CREATE SCHEMA source3;
 
 -- Drop table

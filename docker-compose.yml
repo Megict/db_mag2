@@ -12,6 +12,9 @@ services:
       POSTGRES_USER: "mxcitn"
       POSTGRES_PASSWORD: "1234"
       PGDATA: "/var/lib/postgresql/data/pgdata"
+      
+    volumes:
+      - my-pg-data:/var/lib/postgresql/data
 
     ports:
       - "5432:5432"
