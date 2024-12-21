@@ -57,20 +57,20 @@ on conflict (customer_id)
 ;
 -----------------------------------------------------
 -- заполненние справочника продуктов
--- данные из таблицы craft_market_masters_products
-insert into dwh.d_products 
-	(product_id, product_name, product_description, product_type, product_price, load_dttm)
-	OVERRIDING SYSTEM VALUE 
-	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source2.craft_market_masters_products) 
-on conflict (product_id)
-	do update set ( product_name, product_description, product_price, load_dttm) = 
-		( excluded.product_name, excluded.product_description, excluded.product_price, excluded.load_dttm) -- обновляем старые записи
-;
 -- данные из таблицы craft_market_orders
 insert into dwh.d_products 
 	(product_id, product_name, product_description, product_type, product_price, load_dttm)
 	OVERRIDING SYSTEM VALUE 
 	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source3.craft_market_orders) 
+on conflict (product_id)
+	do update set ( product_name, product_description, product_price, load_dttm) = 
+		( excluded.product_name, excluded.product_description, excluded.product_price, excluded.load_dttm) -- обновляем старые записи
+;
+-- данные из таблицы craft_market_masters_products
+insert into dwh.d_products 
+	(product_id, product_name, product_description, product_type, product_price, load_dttm)
+	OVERRIDING SYSTEM VALUE 
+	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source2.craft_market_masters_products) 
 on conflict (product_id)
 	do update set ( product_name, product_description, product_price, load_dttm) = 
 		( excluded.product_name, excluded.product_description, excluded.product_price, excluded.load_dttm) -- обновляем старые записи
