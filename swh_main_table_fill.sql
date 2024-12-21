@@ -4,7 +4,8 @@ insert into dwh.craftsman_report_datamart
 	count_order_created, count_order_in_progress, count_order_delivery, count_order_done, count_order_not_done, report_period, top_product_category) 
 select a.craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, man_money, our_money, order_count,
 		avg_price, avg_c_age, median_order_time, coalesce(created_c, 0 ), coalesce(delivery_c, 0 ), coalesce(in_p_c, 0 ), coalesce(done_c, 0 ), coalesce(not_done_c, 0 ), to_char(CURRENT_TIMESTAMP, 'YYYY-MM'), top_product
-from ((select craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email from dwh.d_craftsmans) as a
+from ((select craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email from dwh.d_craftsmans 
+		where dwh.d_craftsmans.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart) ) as a
 		join 
 		(select craftsman_id, sum(product_price)*0.9 as "man_money", sum(product_price)*0.1 as "our_money", count(order_id) as "order_count",
 			sum(product_price) / count(product_price) as "avg_price", 
@@ -15,7 +16,11 @@ from ((select craftsman_id, craftsman_name, craftsman_address, craftsman_birthda
 				join dwh.d_products on dwh.f_orders.product_id = dwh.d_products.product_id 
 				join dwh.d_customers on dwh.f_orders.customer_id  = dwh.d_customers.customer_id
 			where order_created_date > CURRENT_TIMESTAMP - (3 * interval '1 year') -- используется три года, т.к. данных за последний месяц нет
-			and dwh.f_orders.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart) -- подгружаем данные из новых записей
+			and ( -- подгружаем данные из новых записей
+				dwh.f_orders.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart) 
+			 or dwh.d_products.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart) 
+			 or dwh.d_customers.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart)
+			)
 			group by craftsman_id) as b
 		on a.craftsman_id = b.craftsman_id
 			full outer join 
@@ -65,10 +70,22 @@ from ((select craftsman_id, craftsman_name, craftsman_address, craftsman_birthda
 				from dwh.f_orders 
 					join dwh.d_products on  dwh.f_orders.product_id = dwh.d_products.product_id 
 				where order_created_date > CURRENT_TIMESTAMP - (3 * interval '1 year')
-				and dwh.f_orders.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart) -- подгружаем данные из новых записей
+				and (	-- подгружаем данные из новых записей
+				   dwh.f_orders.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart) 
+				or dwh.d_products.load_dttm::date > (select max(load_dttm) from dwh.load_dates_craftsman_report_datamart)
+				)
 				group by craftsman_id, product_type -- группируем по мастерам и типам продуктов
 				order by craftsman_id, cnt)
 			where rnk = 1) as h
 		on a.craftsman_id = h.craftsman_id)
+	on counflict (craftsman_id, report_period)
+		do update set (craftsman_name, craftsman_address, craftsman_birthday, craftsman_email,
+					   craftsman_money, platform_money, count_order, avg_price_order, avg_age_customer, median_time_order_completed,
+					   count_order_created, count_order_in_progress, count_order_delivery, count_order_done, count_order_not_done, top_product_category)
+		(excluded.craftsman_name, excluded.craftsman_address, excluded.craftsman_birthday, excluded.craftsman_email,
+		 excluded.craftsman_money, excluded.platform_money, excluded.count_order, excluded.avg_price_order, excluded.avg_age_customer, excluded.median_time_order_completed,
+		 excluded.count_order_created, excluded.count_order_in_progress, excluded.count_order_delivery, excluded.count_order_done, excluded.count_order_not_done, excluded.top_product_category)
+	
+
 ;
 insert into dwh.load_dates_craftsman_report_datamart (load_dttm) values (CURRENT_TIMESTAMP)
