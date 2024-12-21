@@ -78,10 +78,10 @@ from ((select craftsman_id, craftsman_name, craftsman_address, craftsman_birthda
 				order by craftsman_id, cnt)
 			where rnk = 1) as h
 		on a.craftsman_id = h.craftsman_id)
-	on counflict (craftsman_id, report_period)
+	on conflict (craftsman_id, report_period)
 		do update set (craftsman_name, craftsman_address, craftsman_birthday, craftsman_email,
 					   craftsman_money, platform_money, count_order, avg_price_order, avg_age_customer, median_time_order_completed,
-					   count_order_created, count_order_in_progress, count_order_delivery, count_order_done, count_order_not_done, top_product_category)
+					   count_order_created, count_order_in_progress, count_order_delivery, count_order_done, count_order_not_done, top_product_category) = 
 		(excluded.craftsman_name, excluded.craftsman_address, excluded.craftsman_birthday, excluded.craftsman_email,
 		 excluded.craftsman_money, excluded.platform_money, excluded.count_order, excluded.avg_price_order, excluded.avg_age_customer, excluded.median_time_order_completed,
 		 excluded.count_order_created, excluded.count_order_in_progress, excluded.count_order_delivery, excluded.count_order_done, excluded.count_order_not_done, excluded.top_product_category)

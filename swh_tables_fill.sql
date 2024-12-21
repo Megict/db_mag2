@@ -12,7 +12,7 @@ on conflict (craftsman_id)
 insert into dwh.d_craftsmans 
 	(craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, load_dttm)
 	OVERRIDING SYSTEM VALUE 
-	(select craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, CURRENT_TIMESTAMP from source3.craft_market_masters_products) 
+	(select craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, CURRENT_TIMESTAMP from source2.craft_market_masters_products) 
 on conflict (craftsman_id)
 	do update set ( craftsman_name, craftsman_address, craftsman_email, load_dttm) = 
 		( excluded.craftsman_name, excluded.craftsman_address, excluded.craftsman_email, excluded.load_dttm) -- обновляем старые записи
@@ -21,7 +21,7 @@ on conflict (craftsman_id)
 insert into dwh.d_craftsmans 
 	(craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, load_dttm)
 	OVERRIDING SYSTEM VALUE 
-	(select craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, CURRENT_TIMESTAMP from source3.craft_market_wide) 
+	(select distinct craftsman_id, craftsman_name, craftsman_address, craftsman_birthday, craftsman_email, CURRENT_TIMESTAMP from source1.craft_market_wide) 
 on conflict (craftsman_id)
 	do update set ( craftsman_name, craftsman_address, craftsman_email, load_dttm) = 
 		( excluded.craftsman_name, excluded.craftsman_address, excluded.craftsman_email, excluded.load_dttm) -- обновляем старые записи
@@ -41,7 +41,7 @@ on conflict (customer_id)
 insert into dwh.d_customers 
 	(customer_id, customer_name, customer_address, customer_birthday, customer_email, load_dttm)
 	OVERRIDING SYSTEM VALUE 
-	(select customer_id, customer_name, customer_address, customer_birthday, customer_email, CURRENT_TIMESTAMP from source3.craft_market_orders_customers) 
+	(select customer_id, customer_name, customer_address, customer_birthday, customer_email, CURRENT_TIMESTAMP from source2.craft_market_orders_customers) 
 on conflict (customer_id)
 	do update set ( customer_name, customer_address, customer_email, load_dttm) = 
 		( excluded.customer_name, excluded.customer_address, excluded.customer_email, excluded.load_dttm) -- обновляем старые записи
@@ -50,7 +50,7 @@ on conflict (customer_id)
 insert into dwh.d_customers 
 	(customer_id, customer_name, customer_address, customer_birthday, customer_email, load_dttm)
 	OVERRIDING SYSTEM VALUE 
-	(select customer_id, customer_name, customer_address, customer_birthday, customer_email, CURRENT_TIMESTAMP from source3.craft_market_customers) 
+	(select distinct customer_id, customer_name, customer_address, customer_birthday, customer_email, CURRENT_TIMESTAMP from source1.craft_market_wide) 
 on conflict (customer_id)
 	do update set ( customer_name, customer_address, customer_email, load_dttm) = 
 		( excluded.customer_name, excluded.customer_address, excluded.customer_email, excluded.load_dttm) -- обновляем старые записи
@@ -66,11 +66,11 @@ on conflict (product_id)
 	do update set ( product_name, product_description, product_price, load_dttm) = 
 		( excluded.product_name, excluded.product_description, excluded.product_price, excluded.load_dttm) -- обновляем старые записи
 ;
--- данные из таблицы markets_orderss
+-- данные из таблицы craft_market_orders
 insert into dwh.d_products 
 	(product_id, product_name, product_description, product_type, product_price, load_dttm)
 	OVERRIDING SYSTEM VALUE 
-	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source2.markets_orders) 
+	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source3.craft_market_orders) 
 on conflict (product_id)
 	do update set ( product_name, product_description, product_price, load_dttm) = 
 		( excluded.product_name, excluded.product_description, excluded.product_price, excluded.load_dttm) -- обновляем старые записи
@@ -79,7 +79,7 @@ on conflict (product_id)
 insert into dwh.d_products 
 	(product_id, product_name, product_description, product_type, product_price, load_dttm)
 	OVERRIDING SYSTEM VALUE 
-	(select product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source2.craft_market_wide) 
+	(select distinct product_id, product_name, product_description, product_type, product_price, CURRENT_TIMESTAMP from source1.craft_market_wide) 
 on conflict (product_id)
 	do update set ( product_name, product_description, product_price, load_dttm) = 
 		( excluded.product_name, excluded.product_description, excluded.product_price, excluded.load_dttm) -- обновляем старые записи

@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS dwh.craftsman_report_datamart (
 	count_order_done BIGINT NOT NULL, -- количество завершенных заказов за месяц
 	count_order_not_done BIGINT NOT NULL, -- количество незавершенных заказов за месяц
 	report_period VARCHAR NOT NULL, -- отчетный период год и месяц
-	CONSTRAINT craftsman_report_datamart_pk PRIMARY KEY (id)
+	CONSTRAINT craftsman_report_datamart_pk PRIMARY KEY (id),
+	unique(craftsman_id, report_period) -- у каждого мастера может быть только одна запись за каждый отчетный период
 );
 
 -- DDL таблицы инкрементальных загрузок
